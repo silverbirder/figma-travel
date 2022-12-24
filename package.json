@@ -1,0 +1,25 @@
+{
+  "name": "figma-travel",
+  "version": "0.1.0",
+  "description": "figma-travel discovers arbitrary Nodes from Figma files. This is a personal toy.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silverbirder/figma-travel.git"
+  },
+  "keywords": [],
+  "author": "silverbirder <silverbirder@gmail.com> (https://silver-birder.github.io/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/silverbirder/figma-travel/issues"
+  },
+  "homepage": "https://github.com/silverbirder/figma-travel#readme",
+  "dependencies": {
+    "commander": "^9.4.1",
+    "dotenv": "^16.0.3",
+    "figma-api": "^1.11.0"
+  }
+}
