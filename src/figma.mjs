@@ -14,3 +14,13 @@ export const getFile = async (file) => {
   const api = instance();
   return await api.getFile(file);
 };
+
+export const getTeam = async (team) => {
+  const api = instance();
+  return await api.getTeamProjects(team);
+};
+
+export const getProjectFiles = async (project) => {
+  const api = instance();
+  return await api.getProjectFiles(project);
+};
