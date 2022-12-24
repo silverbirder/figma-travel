@@ -1,41 +1,65 @@
 import dotenv from "dotenv";
 import { parse } from "./cli.mjs";
-import { getFile, getTeam, getProjectFiles } from "./figma.mjs";
-import { readJson, writeJson } from "./json.mjs";
+import { getFile, getTeamProjects, getProjectFiles } from "./figma.mjs";
 import { findTypeIsText, filterFont } from "./find.mjs";
 dotenv.config();
 
+const sliceByNumber = (array, number) => {
+  const length = Math.ceil(array.length / number);
+  return new Array(length)
+    .fill()
+    .map((_, i) => array.slice(i * number, (i + 1) * number));
+};
+
 const main = async () => {
   const { options } = parse();
-  const { file, team } = options;
+  const { file, team, project } = options;
+
   if (team) {
-    let data;
-    try {
-      data = readJson(`team_${team}`);
-    } catch {
-      console.log(`getTeam...`);
-      const data = await getTeam(team);
-      writeJson(`team_${team}`, data);
+    const { projects } = await getTeamProjects(team);
+    const projectFiles = await Promise.all(
+      projects.map(async (p) => await getProjectFiles(p.id))
+    );
+    const files = projectFiles.map((projectFile) => projectFile.files).flat();
+    // const sliceFiles = sliceByNumber(files, 3);
+    const sliceFiles = sliceByNumber(files, 3).slice(0, 1);
+    let result = [];
+    for (let i = 0; i < sliceFiles.length; i++) {
+      const files = sliceFiles[i];
+      const data = await Promise.all(
+        files.map(async (file) => await getFile(file.key))
+      );
+      result.push(data);
     }
-    const { projects } = data;
-    const data2 = await getProjectFiles(projects[0].id);
-    writeJson(`project_${team}`, data2);
-    const { files } = data2;
-    const data3 = files[0].key;
-    console.log({ data3 });
-    const data4 = await getFile(data3);
-    writeJson(`file_${data3}`, data4);
+    const flatResult = result.flat();
+    console.log({ flatResult });
+    return;
   }
-  // if (file) {
-  //   console.log(`getFile...`);
-  //   const data = await getFile(file);
-  //   console.log(`file writeJson...`);
-  //   writeJson(`file_${file}`, data);
-  //   const result = findTypeIsText(data.document).flat(Infinity);
-  //   const font = filterFont(result);
-  //   console.log(`font writeJson...`);
-  //   writeJson(`font_${file}`, font);
-  // }
+
+  if (project) {
+    const { files } = await getProjectFiles(project);
+    // const sliceFiles = sliceByNumber(files, 3);
+    const sliceFiles = sliceByNumber(files, 3).slice(0, 1);
+    let result = [];
+    for (let i = 0; i < sliceFiles.length; i++) {
+      const files = sliceFiles[i];
+      const data = await Promise.all(
+        files.map(async (file) => await getFile(file.key))
+      );
+      result.push(data);
+    }
+    const flatResult = result.flat();
+    console.log({ flatResult });
+    return;
+  }
+
+  if (file) {
+    const result = await getFile(file);
+    const data = findTypeIsText(result.document).flat(Infinity);
+    const font = filterFont(data);
+    console.log({ font });
+    return;
+  }
 };
 
 main();

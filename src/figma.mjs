@@ -1,4 +1,5 @@
 import * as Figma from "figma-api";
+import { readJson, writeJson } from "./json.mjs";
 
 const instance = () => {
   const { FIGMA_API_PAT: personalAccessToken } = process.env;
@@ -10,17 +11,40 @@ const instance = () => {
   });
 };
 
-export const getFile = async (file) => {
-  const api = instance();
-  return await api.getFile(file);
+const cache = async (key, getFn) => {
+  let data;
+  try {
+    console.log(`read with ${key}...`);
+    data = readJson(key);
+    console.log(`cache hit ${key}`);
+  } catch {
+    console.log(`getFn with ${key}...`);
+    data = await getFn();
+    writeJson(key, data);
+  }
+  return data;
 };
 
-export const getTeam = async (team) => {
+export const getFile = async (file) => {
   const api = instance();
-  return await api.getTeamProjects(team);
+  const getFn = async () => {
+    return await api.getFile(file);
+  };
+  return await cache(`file_${file}`, getFn);
+};
+
+export const getTeamProjects = async (team) => {
+  const api = instance();
+  const getFn = async () => {
+    return await api.getTeamProjects(team);
+  };
+  return await cache(`team-projects_${team}`, getFn);
 };
 
 export const getProjectFiles = async (project) => {
   const api = instance();
-  return await api.getProjectFiles(project);
+  const getFn = async () => {
+    return await api.getProjectFiles(project);
+  };
+  return await cache(`project-files_${project}`, getFn);
 };

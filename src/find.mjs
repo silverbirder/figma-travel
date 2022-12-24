@@ -14,7 +14,14 @@ export const filterFont = (data) => {
   return data.filter((d) => {
     const {
       style: { fontWeight, fontSize },
+      fills: [
+        {
+          color: { r, g, b },
+        },
+      ],
     } = d;
-    return fontSize === 12 && fontWeight === 400;
+    return (
+      fontSize === 12 && fontWeight === 400 && r === 0 && g === 0 && b === 0
+    );
   });
 };
