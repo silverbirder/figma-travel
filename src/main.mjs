@@ -2,6 +2,9 @@ import dotenv from "dotenv";
 import { parse } from "./cli.mjs";
 import { getFile, getTeamProjects, getProjectFiles } from "./figma.mjs";
 import { findTypeIsText, filterFont } from "./find.mjs";
+import { Parser } from "json2csv";
+import fs from "fs";
+
 dotenv.config();
 
 const sliceByNumber = (array, number) => {
@@ -21,6 +24,16 @@ const main = async () => {
       projects.map(async (p) => await getProjectFiles(p.id))
     );
     const files = projectFiles.map((projectFile) => projectFile.files).flat();
+    // const fields = ["id", "name"];
+    // const opts = { fields };
+    // const parser = new Parser(opts);
+    // const csv = parser.parse(projects);
+    // fs.writeFileSync(`./data/${team}.csv`, csv, "utf8");
+    // const fields = ["key", "name", "thumbnail_url", "last_modified"];
+    // const opts = { fields };
+    // const parser = new Parser(opts);
+    // const csv = parser.parse(files);
+    // fs.writeFileSync(`./data/projects.csv`, csv, "utf8");
     // const sliceFiles = sliceByNumber(files, 3);
     const sliceFiles = sliceByNumber(files, 3).slice(0, 1);
     let result = [];
