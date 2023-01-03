@@ -28,7 +28,18 @@ const cache = async (key, getFn) => {
 export const getFile = async (file) => {
   const api = instance();
   const getFn = async () => {
-    return await api.getFile(file);
+    // To avoid ERROR 500.
+    // https://www.figma.com/developers/api#errors
+    const shallowData = await api.getFile(file, { depth: 1 });
+    const {
+      document: { children },
+    } = shallowData;
+    const deepDatas = await Promise.all(
+      children.map(async (child) => {
+        return await api.getFile(file, { ids: [child.id] });
+      })
+    );
+    return Object.assign(shallowData, ...deepDatas);
   };
   return await cache(`file_${file}`, getFn);
 };
