@@ -36,10 +36,15 @@ export const getFile = async (file) => {
     } = shallowData;
     const deepDatas = await Promise.all(
       children.map(async (child) => {
-        return await api.getFile(file, { ids: [child.id] });
+        const data = await api.getFile(file, { ids: [child.id] });
+        const {
+          document: { children },
+        } = data;
+        return children.find((c) => c.id === child.id);
       })
     );
-    return Object.assign(shallowData, ...deepDatas);
+    shallowData.document.children = deepDatas;
+    return shallowData;
   };
   return await cache(`file_${file}`, getFn);
 };
