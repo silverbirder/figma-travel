@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
 import { parse } from "./cli.mjs";
 import { getFile, getTeamProjects, getProjectFiles } from "./figma.mjs";
-import { writeJson } from "./json.mjs";
+import { writeJson, writeCsv } from "./json.mjs";
+import json2csv from "json-2-csv";
 
 dotenv.config();
 
@@ -76,7 +77,8 @@ const main = async () => {
 
       return d;
     });
-    writeJson(`document_${file}`, flatDocuments2);
+    const csv = await json2csv.json2csvAsync(flatDocuments2);
+    writeCsv(`csv_${file}`, csv);
     return;
   }
 };

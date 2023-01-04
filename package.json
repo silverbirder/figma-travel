@@ -21,6 +21,7 @@
     "commander": "^9.4.1",
     "dotenv": "^16.0.3",
     "figma-api": "^1.11.0",
+    "json-2-csv": "^3.18.0",
     "json2csv": "^5.0.7"
   }
 }
