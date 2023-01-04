@@ -1,9 +1,7 @@
 import dotenv from "dotenv";
 import { parse } from "./cli.mjs";
 import { getFile, getTeamProjects, getProjectFiles } from "./figma.mjs";
-import { findTypeIsText, filterFont } from "./find.mjs";
-import { Parser } from "json2csv";
-import fs from "fs";
+import { writeJson } from "./json.mjs";
 
 dotenv.config();
 
@@ -68,11 +66,30 @@ const main = async () => {
 
   if (file) {
     const result = await getFile(file);
-    const data = findTypeIsText(result.document).flat(Infinity);
-    const font = filterFont(data);
-    console.log({ font });
+    const flatDocuments = flatten(result.document.children);
+    const flatDocuments2 = flatDocuments.map((d) => {
+      d[
+        "url"
+      ] = `https://www.figma.com/file/${file}/?node-id=${encodeURIComponent(
+        d.id
+      )}`;
+
+      return d;
+    });
+    writeJson(`document_${file}`, flatDocuments2);
     return;
   }
 };
+
+function flatten(array, path = []) {
+  return array.reduce(function (flattened, item) {
+    const { children, ...other } = item;
+    path = [...path, other.id];
+    other["path"] = path;
+    return flattened
+      .concat([other])
+      .concat(children ? flatten(children, path) : []);
+  }, []);
+}
 
 main();
