@@ -2,6 +2,8 @@
 
 figma-travel discovers arbitrary Nodes from Figma files. This is a personal toy.
 
+👉 I'm remaking [figma-download](https://github.com/silverbirder/figma-download)
+
 ## How to use
 
 ```
